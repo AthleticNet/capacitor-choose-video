@@ -21,19 +21,25 @@ public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, U
   }
   
   @objc func requestFilesystemAccess(_ call: CAPPluginCall) {
+    print("in requestFilesystemAccess")
       DispatchQueue.main.async {
         let photoAuthorizationStatus = PHPhotoLibrary.authorizationStatus()
+        if photoAuthorizationStatus == .notDetermined {
+          // Access has not been determined.
+          PHPhotoLibrary.requestAuthorization({ (newStatus) in
+              if (newStatus == PHAuthorizationStatus.authorized) {
+                call.success([
+                    "hasPermission": true
+                ])
+              }
+              else {
+                call.reject("User denied access to photos");
+              }
+          })
+        }
         if photoAuthorizationStatus == .restricted || photoAuthorizationStatus == .denied {
           print("User denied access to photos")
-          call.error(["hasPermission": false]);
-          return
-        }
-
-        let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
-
-        if cameraAuthorizationStatus == .restricted || photoAuthorizationStatus == .denied {
-          print("User denied access to camera")
-          call.error(["hasPermission": false]);
+          call.reject("User denied access to photos");
           return
         }
 
