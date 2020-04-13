@@ -6,4 +6,5 @@
 CAP_PLUGIN(CapacitorChooseVideo, "CapacitorChooseVideo",
            CAP_PLUGIN_METHOD(echo, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getVideo, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(requestFilesystemAccess, CAPPluginReturnPromise);
 )
