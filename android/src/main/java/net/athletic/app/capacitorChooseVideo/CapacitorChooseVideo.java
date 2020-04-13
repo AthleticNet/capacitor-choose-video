@@ -51,13 +51,12 @@ public class CapacitorChooseVideo extends Plugin {
   @PluginMethod()
   public void requestFilesystemAccess(PluginCall call) {
     saveCall(call);
-    checkPhotosPermissions(call);
-    // TODO What happens if a person says no?
+    if (checkPhotosPermissions(call)) {
+      JSObject ret = new JSObject();
+      ret.put("hasPermission", true);
 
-    JSObject ret = new JSObject();
-    ret.put("hasPermission", true);
-
-    call.resolve(ret);
+      call.resolve(ret);
+    };
   }
 
   private void showVideos(final PluginCall call) {
