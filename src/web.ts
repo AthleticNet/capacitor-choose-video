@@ -14,6 +14,9 @@ export class CapacitorChooseVideoWeb extends WebPlugin implements CapacitorChoos
     return options;
   }
 
+  async requestFilesystemAccess(): Promise<{hasPermission: boolean}> {
+    return Promise.resolve({'hasPermission': true});
+  }
 
   async getVideo(options: { value: string }): Promise<{path: string}> {
     console.log(options);

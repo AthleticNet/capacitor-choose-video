@@ -20,6 +20,12 @@ import com.getcapacitor.PluginRequestCodes;
 import java.io.File;
 import java.io.InputStream;
 
+// Dev note: If the com.getcapacitor files ever say things like "cannot resolve symbol",
+// 1. Close Android Studtio
+// 2. go to android/ folder and run rm -R gradle .gradle
+// 3. reopen android studio.
+// See Bryan Herbst note at bottom of this page here: https://groups.google.com/forum/#!topic/adt-dev/kOccJ1Pfnhk
+
 @NativePlugin(
   requestCodes={CapacitorChooseVideo.REQUEST_VIDEO_PICK}
 )
@@ -40,6 +46,18 @@ public class CapacitorChooseVideo extends Plugin {
     saveCall(call);
 
     showVideos(call);
+  }
+
+  @PluginMethod()
+  public void requestFilesystemAccess(PluginCall call) {
+    saveCall(call);
+    checkPhotosPermissions(call);
+    // TODO What happens if a person says no?
+
+    JSObject ret = new JSObject();
+    ret.put("hasPermission", true);
+
+    call.resolve(ret);
   }
 
   private void showVideos(final PluginCall call) {
