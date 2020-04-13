@@ -19,6 +19,7 @@ import com.getcapacitor.PluginRequestCodes;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 // Dev note: If the com.getcapacitor files ever say things like "cannot resolve symbol",
 // 1. Close Android Studtio
@@ -51,9 +52,11 @@ public class CapacitorChooseVideo extends Plugin {
   @PluginMethod()
   public void requestFilesystemAccess(PluginCall call) {
     saveCall(call);
-    if (checkPhotosPermissions(call)) {
+    if (checkCameraAndFileReadPermissions(call)) {
       JSObject ret = new JSObject();
       ret.put("hasPermission", true);
+
+      Log.i("permissionReturn", ret.toString());
 
       call.resolve(ret);
     };
@@ -114,6 +117,27 @@ public class CapacitorChooseVideo extends Plugin {
         cursor.close();
       }
     }
+  }
+
+  private boolean checkCameraAndFileReadPermissions(PluginCall call) {
+    boolean storagePermission = hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+    boolean cameraPermission = hasPermission(Manifest.permission.CAMERA);
+
+    ArrayList<String> needPermissions = new ArrayList<String>();
+    if (!storagePermission) {
+      needPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+    }
+    if (!cameraPermission) {
+      needPermissions.add(Manifest.permission.CAMERA);
+    }
+
+    String[] permissionArray = needPermissions.toArray(new String[0]);
+
+    if(permissionArray.length > 0) {
+      pluginRequestPermissions(permissionArray, REQUEST_VIDEO_PICK);
+      return false;
+    }
+    return true;
   }
 
   private boolean checkPhotosPermissions(PluginCall call) {
