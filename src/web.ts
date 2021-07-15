@@ -23,10 +23,3 @@ export class CapacitorChooseVideoWeb extends WebPlugin implements CapacitorChoos
     return Promise.resolve({'path': ''});
   }
 }
-
-const CapacitorChooseVideo = new CapacitorChooseVideoWeb();
-
-export { CapacitorChooseVideo };
-
-import { registerWebPlugin } from '@capacitor/core';
-registerWebPlugin(CapacitorChooseVideo);

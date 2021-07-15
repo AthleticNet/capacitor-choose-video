@@ -1,2 +1,11 @@
+import { registerPlugin } from "@capacitor/core";
+import { CapacitorChooseVideoPlugin } from "./definitions";
+
 export * from './definitions';
-export * from './web';
+
+const CapacitorChooseVideo = registerPlugin<CapacitorChooseVideoPlugin>('CapacitorChooseVideo', {
+  web: () => import('./web').then(m => new m.CapacitorChooseVideoWeb()),
+});
+
+export * from './definitions';
+export { CapacitorChooseVideo };

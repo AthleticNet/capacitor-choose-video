@@ -28,7 +28,7 @@ public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, U
           // Access has not been determined.
           PHPhotoLibrary.requestAuthorization({ (newStatus) in
               if (newStatus == PHAuthorizationStatus.authorized) {
-                call.success([
+                call.resolve([
                     "hasPermission": true
                 ])
               }
@@ -43,7 +43,7 @@ public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, U
           return
         }
 
-        call.success([
+        call.resolve([
             "hasPermission": true
         ])
       }
@@ -96,7 +96,7 @@ public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, U
     print("info");
     print(videoURL)
     dump(info);
-    call?.success([
+    call?.resolve([
       "path" : videoURL?.absoluteString
     ])
     picker.dismiss(animated: true, completion: nil)
