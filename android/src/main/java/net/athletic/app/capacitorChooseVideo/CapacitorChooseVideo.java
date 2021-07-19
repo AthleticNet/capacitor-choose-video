@@ -1,25 +1,24 @@
 package net.athletic.app.capacitorChooseVideo;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import androidx.activity.result.ActivityResult;
+
 import com.getcapacitor.JSObject;
-import com.getcapacitor.NativePlugin;
+import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
-import com.getcapacitor.PluginRequestCodes;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
+import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
+import com.getcapacitor.annotation.ActivityCallback;
 
 // Dev note: If the com.getcapacitor files ever say things like "cannot resolve symbol",
 // 1. Close Android Studtio
@@ -27,8 +26,18 @@ import java.util.ArrayList;
 // 3. reopen android studio.
 // See Bryan Herbst note at bottom of this page here: https://groups.google.com/forum/#!topic/adt-dev/kOccJ1Pfnhk
 
-@NativePlugin(
-  requestCodes={CapacitorChooseVideo.REQUEST_VIDEO_PICK}
+@CapacitorPlugin(
+        name = "CapacitorChooseVideo",
+        permissions = {
+                @Permission(
+                        alias = "camera",
+                        strings = {Manifest.permission.CAMERA}
+                ),
+                @Permission(
+                        alias = "read_storage",
+                        strings = {Manifest.permission.READ_EXTERNAL_STORAGE}
+                )
+        }
 )
 public class CapacitorChooseVideo extends Plugin {
   static final int REQUEST_VIDEO_PICK = 1000;
@@ -39,61 +48,50 @@ public class CapacitorChooseVideo extends Plugin {
 
     JSObject ret = new JSObject();
     ret.put("value", value);
-    call.success(ret);
+    call.resolve(ret);
   }
 
   @PluginMethod()
   public void getVideo(PluginCall call) {
-    saveCall(call);
-
-    showVideos(call);
+    if (getPermissionState("camera") != PermissionState.GRANTED) {
+      requestPermissionForAlias("camera", call, "openVideosPermsCallback");
+    } else {
+      openVideos(call);
+    }
   }
 
   @PluginMethod()
   public void requestFilesystemAccess(PluginCall call) {
-    saveCall(call);
-    if (checkCameraAndFileReadPermissions(call)) {
-      JSObject ret = new JSObject();
-      ret.put("hasPermission", true);
-
-      Log.i("permissionReturn", ret.toString());
-
-      call.resolve(ret);
-    };
-  }
-
-  private void showVideos(final PluginCall call) {
-    openVideos(call);
+    if (!(getPermissionState("camera") == PermissionState.GRANTED || getPermissionState("storage") == PermissionState.GRANTED)) {
+      requestPermissionForAliases(new String[]{"camera", "storage"}, call, "requestFilesystemAccessPermsCallback");
+    } else {
+      returnFilesystemAccess(call);
+    }
   }
 
   public void openVideos(final PluginCall call) {
-    if (checkPhotosPermissions(call)) {
-      Intent intent = new Intent(Intent.ACTION_PICK);
-      intent.setType("video/*");
-      startActivityForResult(call, intent, REQUEST_VIDEO_PICK);
-    }
+    Intent intent = new Intent(Intent.ACTION_PICK);
+    intent.setType("video/*");
+    startActivityForResult(call, intent, "processPickedVideo");
   }
 
-  @Override
-  protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
-    super.handleOnActivityResult(requestCode, resultCode, data);
+  public void returnFilesystemAccess(final PluginCall call) {
+    JSObject ret = new JSObject();
+    ret.put("hasPermission", true);
 
-    PluginCall savedCall = getSavedCall();
+    Log.i("permissionReturn", ret.toString());
 
-    if (savedCall == null) {
-      return;
-    }
-
-    processPickedVideo(savedCall, data);
+    call.resolve(ret);
   }
 
-  public void processPickedVideo(PluginCall call, Intent data) {
+  @ActivityCallback
+  public void processPickedVideo(PluginCall call, ActivityResult data) {
     if (data == null) {
-      call.error("No video picked");
+      call.reject("No video picked");
       return;
     }
 
-    Uri u = data.getData();
+    Uri u = data.getData().getData();
 
     JSObject ret = new JSObject();
     ret.put("path", "file://" + this.getRealPathFromURI(getContext(), u));
@@ -119,32 +117,21 @@ public class CapacitorChooseVideo extends Plugin {
     }
   }
 
-  private boolean checkCameraAndFileReadPermissions(PluginCall call) {
-    boolean storagePermission = hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-    boolean cameraPermission = hasPermission(Manifest.permission.CAMERA);
-
-    ArrayList<String> needPermissions = new ArrayList<String>();
-    if (!storagePermission) {
-      needPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+  @PermissionCallback
+  private void openVideosPermsCallback(PluginCall call) {
+    if (getPermissionState("camera") == PermissionState.GRANTED) {
+      openVideos(call);
+    } else {
+      call.reject("Permission is required to take a video");
     }
-    if (!cameraPermission) {
-      needPermissions.add(Manifest.permission.CAMERA);
-    }
-
-    String[] permissionArray = needPermissions.toArray(new String[0]);
-
-    if(permissionArray.length > 0) {
-      pluginRequestPermissions(permissionArray, REQUEST_VIDEO_PICK);
-      return false;
-    }
-    return true;
   }
 
-  private boolean checkPhotosPermissions(PluginCall call) {
-    if(!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-      pluginRequestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_VIDEO_PICK);
-      return false;
+  @PermissionCallback
+  private void requestFilesystemAccessPermsCallback(PluginCall call) {
+    if (getPermissionState("storage") == PermissionState.GRANTED && getPermissionState("camera") == PermissionState.GRANTED) {
+      returnFilesystemAccess(call);
+    } else {
+      call.reject("Filesystem and camera permissions are needed");
     }
-    return true;
   }
 }
