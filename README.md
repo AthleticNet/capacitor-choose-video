@@ -7,4 +7,4 @@ Select a video with Capacitor
 3. Run `npm publish`
 
 Use v0.0.8 with Capacitor 2
-Use v0.0.9 with Capacitor 3
+Use v0.0.10 with Capacitor 3
