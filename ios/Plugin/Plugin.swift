@@ -15,7 +15,7 @@ public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, U
   @objc func echo(_ call: CAPPluginCall) {
       print("in echo");
       let value = call.getString("value") ?? ""
-      call.success([
+      call.resolve([
           "value": value
       ])
   }
@@ -51,23 +51,19 @@ public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, U
 
   @objc func getVideo(_ call: CAPPluginCall) {
     self.call = call;
-    print("getVideo");
     DispatchQueue.main.async {
-      print("getVideo2");
       self.imagePicker = UIImagePickerController();
       self.imagePicker!.delegate = self;
     }
     
-    print("showVideos");
     self.showVideos(call);
-    
   }
     
   func showVideos(_ call: CAPPluginCall) {
     DispatchQueue.main.async {
       let photoAuthorizationStatus = PHPhotoLibrary.authorizationStatus()
       if photoAuthorizationStatus == .restricted || photoAuthorizationStatus == .denied {
-        call.error("User denied access to photos")
+        call.reject("User denied access to photos")
         return
       }
 
@@ -76,7 +72,7 @@ public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, U
       self.imagePicker!.sourceType = .photoLibrary
       self.imagePicker!.mediaTypes = ["public.movie"]
 
-      self.bridge.viewController.present(self.imagePicker!, animated: true, completion: nil)
+      self.bridge?.viewController?.present(self.imagePicker!, animated: true, completion: nil)
     }
   }
     
@@ -104,10 +100,10 @@ public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, U
 
   public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
     picker.dismiss(animated: true)
-    self.call?.error("User cancelled photos app")
+    self.call?.reject("User cancelled photos app")
   }
   
   public func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
-    self.call?.error("User cancelled photos app")
+    self.call?.reject("User cancelled photos app")
   }
 }
