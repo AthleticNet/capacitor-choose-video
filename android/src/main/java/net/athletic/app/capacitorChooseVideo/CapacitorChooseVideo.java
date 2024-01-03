@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -34,7 +35,7 @@ import com.getcapacitor.annotation.ActivityCallback;
                         strings = {Manifest.permission.CAMERA}
                 ),
                 @Permission(
-                        alias = "read_storage",
+                        alias = "storage",
                         strings = {Manifest.permission.READ_EXTERNAL_STORAGE}
                 )
         }
@@ -62,10 +63,18 @@ public class CapacitorChooseVideo extends Plugin {
 
   @PluginMethod()
   public void requestFilesystemAccess(PluginCall call) {
-    if (!(getPermissionState("camera") == PermissionState.GRANTED || getPermissionState("storage") == PermissionState.GRANTED)) {
-      requestPermissionForAliases(new String[]{"camera", "storage"}, call, "requestFilesystemAccessPermsCallback");
+    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      if (!(getPermissionState("camera") == PermissionState.GRANTED)) {
+        requestPermissionForAlias("camera", call, "requestFilesystemAccessPermsCameraOnlyCallback");
+      } else {
+        returnFilesystemAccess(call);
+      }
     } else {
-      returnFilesystemAccess(call);
+      if (!(getPermissionState("camera") == PermissionState.GRANTED || getPermissionState("storage") == PermissionState.GRANTED)) {
+        requestPermissionForAliases(new String[]{"camera", "storage"}, call, "requestFilesystemAccessPermsCallback");
+      } else {
+        returnFilesystemAccess(call);
+      }
     }
   }
 
@@ -132,6 +141,15 @@ public class CapacitorChooseVideo extends Plugin {
       returnFilesystemAccess(call);
     } else {
       call.reject("Filesystem and camera permissions are needed");
+    }
+  }
+
+  @PermissionCallback
+  private void requestFilesystemAccessPermsCameraOnlyCallback(PluginCall call) {
+    if (getPermissionState("camera") == PermissionState.GRANTED) {
+      returnFilesystemAccess(call);
+    } else {
+      call.reject("Camera permissions are needed");
     }
   }
 }
