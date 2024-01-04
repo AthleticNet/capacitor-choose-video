@@ -1,6 +1,6 @@
 {
   "name": "@athleticnet/capacitor-choose-video",
-  "version": "5.0.1",
+  "version": "5.0.4",
   "description": "Select a video in ios",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -27,7 +27,7 @@
     "dist/",
     "ios/",
     "android/",
-    "CapacitorChooseVideo.podspec"
+    "AthleticnetCapacitorChooseVideo.podspec"
   ],
   "keywords": [
     "capacitor",
