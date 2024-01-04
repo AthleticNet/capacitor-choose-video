@@ -1,6 +1,6 @@
 
   Pod::Spec.new do |s|
-    s.name = 'AthleticCapacitorChooseVideo'
+    s.name = 'AthleticnetCapacitorChooseVideo'
     s.version = '5.0.2'
     s.summary = 'Select a video in ios'
     s.license = 'MIT'
