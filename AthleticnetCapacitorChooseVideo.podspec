@@ -8,6 +8,6 @@
     s.author = 'Ben Thomas'
     s.source = { :git => 'https://github.com/AthleticNet/capacitor-choose-video', :tag => s.version.to_s }
     s.source_files = 'ios/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}'
-    s.ios.deployment_target  = '14.0'
+    s.ios.deployment_target  = '13.0'
     s.dependency 'Capacitor'
   end
