@@ -10,3 +10,4 @@ Select a video with Capacitor
 - Use v0.0.10 with Capacitor 3
 - Use v5.0.5 with Capacitor 5
 - Use v6.0.0 with Capacitor 6
+- Use v7.0.0 with Capacitor 7
