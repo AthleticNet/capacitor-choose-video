@@ -8,6 +8,7 @@
     "build": "npm run clean && tsc",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
+    "verify:ios": "xcodebuild -scheme AthleticnetCapacitorChooseVideo -destination generic/platform=iOS",
     "prepublishOnly": "npm run build",
     "ppatch": "npm version patch && npm publish",
     "pminor": "npm version minor && npm publish"
@@ -26,8 +27,10 @@
   },
   "files": [
     "dist/",
-    "ios/",
+    "ios/Sources",
+    "ios/Tests",
     "android/",
+    "Package.swift",
     "AthleticnetCapacitorChooseVideo.podspec"
   ],
   "keywords": [
