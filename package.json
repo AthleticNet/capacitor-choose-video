@@ -1,6 +1,6 @@
 {
   "name": "@athleticnet/capacitor-choose-video",
-  "version": "8.0.0",
+  "version": "8.1.0",
   "description": "Select a video in ios",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -15,12 +15,13 @@
   },
   "author": "Ben Thomas",
   "license": "MIT",
-  "dependencies": {
-    "@capacitor/core": "^8.0.0"
+  "peerDependencies": {
+    "@capacitor/core": ">=8.0.0"
   },
   "devDependencies": {
     "@capacitor/android": "^8.0.0",
     "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
     "@capacitor/ios": "^8.0.0",
     "rimraf": "^6.1.0",
     "typescript": "^5.9.3"
@@ -29,7 +30,8 @@
     "dist/",
     "ios/Sources",
     "ios/Tests",
-    "android/",
+    "android/src/main/",
+    "android/build.gradle",
     "Package.swift",
     "AthleticnetCapacitorChooseVideo.podspec"
   ],
