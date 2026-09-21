@@ -1,13 +1,22 @@
 import Foundation
+import UIKit
 import Capacitor
 import Photos
 
 /**
  * Please read the Capacitor iOS Plugin Development Guide
- * here: https://capacitor.ionicframework.com/docs/plugins/ios
+ * here: https://capacitorjs.com/docs/plugins/ios
  */
 @objc(CapacitorChooseVideo)
-public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPopoverPresentationControllerDelegate {
+public class CapacitorChooseVideo: CAPPlugin, CAPBridgedPlugin, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPopoverPresentationControllerDelegate {
+  public let identifier = "CapacitorChooseVideo"
+  public let jsName = "CapacitorChooseVideo"
+  public let pluginMethods: [CAPPluginMethod] = [
+    CAPPluginMethod(name: "echo", returnType: CAPPluginReturnPromise),
+    CAPPluginMethod(name: "getVideo", returnType: CAPPluginReturnPromise),
+    CAPPluginMethod(name: "requestFilesystemAccess", returnType: CAPPluginReturnPromise)
+  ]
+
   var imagePicker: UIImagePickerController?
   var call: CAPPluginCall?
   var videoURL: NSURL?
@@ -90,7 +99,7 @@ public class CapacitorChooseVideo: CAPPlugin, UIImagePickerControllerDelegate, U
     print("in imagePickerController");
     videoURL = info[UIImagePickerController.InfoKey(rawValue: "UIImagePickerControllerMediaURL")] as? NSURL
     print("info");
-    print(videoURL)
+    print(videoURL as Any)
     dump(info);
     call?.resolve([
       "path" : videoURL?.absoluteString

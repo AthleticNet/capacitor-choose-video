@@ -7,6 +7,12 @@ Pods
 Build
 xcuserdata
 
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+DerivedData/
+
 # macOS files
 .DS_Store
 
