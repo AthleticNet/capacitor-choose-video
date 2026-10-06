@@ -102,7 +102,7 @@ public class CapacitorChooseVideo: CAPPlugin, CAPBridgedPlugin, UIImagePickerCon
     print(videoURL as Any)
     dump(info);
     call?.resolve([
-      "path" : videoURL?.absoluteString
+      "path" : videoURL?.absoluteString as Any
     ])
     picker.dismiss(animated: true, completion: nil)
   }
